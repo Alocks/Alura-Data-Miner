@@ -1,4 +1,4 @@
-from alurascraper import AluraScraper
+from alurascraper import AluraScraper, AluraLogin, AluraCrawler
 import parser
 
 
@@ -7,16 +7,21 @@ print('Username:')
 user = input()
 print('Password:')
 password = input()
-f = AluraScraper(user, password)
+###############################
+
+#######Creating Objects########
+l = AluraLogin(user, password)
+c = AluraCrawler(l._session)
+s = AluraScraper(l._session)
 ###############################
 
 ####################Crawler######################
-formacao = f.choose_formation()#Choose formation
-links = f.formation_crawler()#collect links
+formacao = c.choose_formation()#Choose formation
+links = c.formation_crawler(formacao)#collect links
 #################################################
 
 ################Scraper################
-f.scraper(links) #Scrap all json chunks
+s.scraper(links) #Scrap all json chunks
 #######################################
 
 ###########################Parser###########################

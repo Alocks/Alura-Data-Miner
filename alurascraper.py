@@ -14,12 +14,13 @@ class AluraLogin(object):
             self._session.select_form(nr=1)
             self._session.form['username'] = user
             self._session.form['password'] = password
+
+
+class AluraCrawler():
+        def __init__(self, session):
+            self._session = session
             self._session.submit()
             self._principal = self._session.open('https://cursos.alura.com.br/formacoes').read()
-
-class AluraCrawler(AluraLogin):
-        def __init__(self, user, password):
-            super().__init__(user, password)
 
         def choose_formation(self):
             categorias = self.__categories_crawler()
@@ -76,9 +77,16 @@ class AluraCrawler(AluraLogin):
                     break
             return escolha
 
-class AluraScraper(AluraCrawler):
-    def __init__(self, user, password):
-        super().__init__(user, password)
+        def _text_scraper(self, classe, req, tag='li', prop=None):
+            links = []
+            soup = BeautifulSoup(req, 'html.parser')
+            for a in soup.find_all(tag, class_=classe):
+                links.append(a[prop])
+            return links
+
+class AluraScraper():
+    def __init__(self, session):
+        self._session = session
 
     def scraper(self, links):
         result = []
@@ -94,10 +102,3 @@ class AluraScraper(AluraCrawler):
             for item in result:
                 f.write(f'{item}\n')
         print('Done! Saved in data.txt')
-
-    def _text_scraper(self, classe, req, tag='li', prop=None):
-        links = []
-        soup = BeautifulSoup(req, 'html.parser')
-        for a in soup.find_all(tag, class_=classe):
-            links.append(a[prop])
-        return links
