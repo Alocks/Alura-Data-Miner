@@ -1,6 +1,6 @@
 import codecs, os, requests
 
-def encode_json(file):
+def decode_json(file):
         file = open(file, 'r')
         file = file.read().replace(chr(92) * 2, chr(92))
         file = codecs.decode(file, 'unicode_escape')
