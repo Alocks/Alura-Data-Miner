@@ -6,7 +6,7 @@ By the way, the links for the video resets daily. Pay attention when downloading
 
 # Alura Scraper Documentation
 AluraLogin:  
--Login in the site. Only needed to crawl and scrap a formation.  
+-Login on the site. Only needed to crawl and scrap a formation.  
 -Uses AluraScraper and AluraScraper as subclasses, so you only need to create one object.
   
 AluraScraper:  
