@@ -1,94 +1,46 @@
 from bs4 import BeautifulSoup
-import mechanize, os
 from http.cookiejar import CookieJar
+import mechanize
+import os
 
 liga = 'https://cursos.alura.com.br'
 
-class AluraLogin(object):
-        def __init__(self, user, password):
-            cj = CookieJar()
-            self._session = mechanize.Browser()
-            self._session.set_handle_robots(False)
-            self._session.set_cookiejar(cj)
-            self._session.open("https://cursos.alura.com.br/loginForm")
-            self._session.select_form(nr=1)
-            self._session.form['username'] = user
-            self._session.form['password'] = password
+
+# lists properties
+def _listing(opcoes):
+    while True:
+        escolha = ''
+        os.system('cls')
+        print(' | '.join(str(i) for i in opcoes))
+        print('Selecione uma das opções:')
+        opcao = input()
+        for i in opcoes:
+            if opcao in i and opcoes:
+                escolha = i
+                break
+        if escolha:
+            break
+    return escolha
 
 
-class AluraCrawler():
-        def __init__(self, session):
+# Scraps Alura Formations!
+class AluraScraper:
+    def __init__(self, session=None):
+        # If called by AluraLogin, uses session from AluraLogin
+        if session:
             self._session = session
-            self._session.submit()
-            self._principal = self._session.open('https://cursos.alura.com.br/formacoes').read()
+            self._principal = self._session.open(liga + '/formacoes').read()
+        # else if called without AluraLogin, create its own session
+        else:
+            session = mechanize.Browser()
+            self._principal = session.open(liga + '/formacoes').read()
+        # properties to save time next time it uses again
+        self._categories = None
+        self._category = None
+        self._formations = None
 
-        def choose_formation(self):
-            categorias = self.__categories_crawler()
-            categoria = self.__listing(categorias)
-            formacoes = self.__formations_crawler()
-            formacao = self.__listing(formacoes)
-            print(formacao + 'choosen...')
-            return ['https://cursos.alura.com.br' + formacao]
-
-        def __categories_crawler(self):
-            lista_categoria = ['formacoes__item']
-            links = self._text_scraper(lista_categoria, self._principal, prop='id')
-            return links
-
-        def __formations_crawler(self):
-            lista_formacao = ['formacao__link']
-            links = self._text_scraper(lista_formacao, self._principal, tag='a', prop='href')
-            return links
-
-        def formation_crawler(self, lst, aux=0):
-            classes = ['learning-content__link', 'courseSectionList-section', 'task-menu-nav-item-link-VIDEO']
-            for link in lst:
-                req = self._session.open(link).read()
-                links = self.__link_crawler(classes, req, aux)
-                print(links)
-
-            if aux < 2:
-                print(str(aux*20) + '%')
-                return self.formation_crawler(lst=links, aux=aux+1)
-            return links
-
-        def __link_crawler(self, classes, req, aux=0):
-            links = []
-            soup = BeautifulSoup(req, 'html.parser')
-            for a in soup.find_all('a', class_=classes[aux]):
-                if a['href'].startswith('/'):
-                    print(a['href'])
-                    links.append(liga + a['href'])
-            return links
-
-        def __listing(self, opcoes):
-            clear = lambda: os.system('cls')
-            while (True):
-                escolha = ''
-                clear()
-                print(' | '.join(str(i) for i in opcoes))
-                print('Selecione uma das opções:')
-                opcao = input()
-                for i in opcoes:
-                    if opcao in i and opcoes:
-                        escolha = i
-                        break
-                if escolha:
-                    break
-            return escolha
-
-        def _text_scraper(self, classe, req, tag='li', prop=None):
-            links = []
-            soup = BeautifulSoup(req, 'html.parser')
-            for a in soup.find_all(tag, class_=classe):
-                links.append(a[prop])
-            return links
-
-class AluraScraper():
-    def __init__(self, session):
-        self._session = session
-
-    def scraper(self, links):
+    # Scrap formations videos from json requests and save to data.txt
+    def formation_scraper(self, links):
         result = []
         for link in links:
             print(link + '/video')
@@ -102,3 +54,113 @@ class AluraScraper():
             for item in result:
                 f.write(f'{item}\n')
         print('Done! Saved in data.txt')
+
+    # Scrap categories and formations from the site
+    def _text_scraper(self, tag='li', category=None):
+        classes = ['formacoes__item', 'formacao__link']
+        links = []
+        soup = BeautifulSoup(self._principal, 'html.parser')
+        if category is None:
+            for a in soup.find_all(tag, class_=classes[0]):
+                links.append(a['id'])
+        else:
+            li = soup.find('li', id=category, recursive=True)
+            for i in li.findChildren('a', class_=classes[1]):
+                links.append(i['href'])
+        return links
+
+    # saves categories and formations to the properties
+    def formation_categories(self):
+        if not self.categories:
+            self.categories = self._text_scraper()
+        if not self.category:
+            self.category = _listing(self.categories)
+        if not self.formations:
+            self.formations = self._text_scraper(category=self.category)
+
+    @property
+    def categories(self):
+        return self._categories
+
+    @categories.setter
+    def categories(self, value):
+        self._categories = value
+
+    @property
+    def category(self):
+        return self._category
+
+    @category.setter
+    def category(self, value):
+        self._category = value
+
+    @property
+    def formations(self):
+        return self._formations
+
+    @formations.setter
+    def formations(self, value):
+        self._formations = value
+
+
+class AluraCrawler(AluraScraper):
+    def __init__(self, session=None):
+        self._session = session
+        super().__init__(self._session)
+        self._link = None
+        self._links = None
+
+    def choose_formation(self, formacoes):
+        formacao = _listing(formacoes)
+        print(formacao + '  escolhida...')
+        self.link = ['https://cursos.alura.com.br' + formacao]
+
+    def formation_crawler(self, lst, aux=0):
+        classes = ['learning-content__link', 'courseSectionList-section', 'task-menu-nav-item-link-VIDEO']
+        links = []
+        for link in lst:
+            req = self._session.open(link).read()
+            links.extend(self.__link_crawler(classes, req, aux))
+            print(links)
+        if aux < 2:
+            return self.formation_crawler(lst=links, aux=aux + 1)
+        self.links = links
+
+    def __link_crawler(self, classes, req, aux=0):
+        links = []
+        soup = BeautifulSoup(req, 'html.parser')
+        for a in soup.find_all('a', class_=classes[aux]):
+            if a['href'].startswith('/'):
+                print(a['href'])
+                links.append(liga + a['href'])
+        return links
+
+    @property
+    def link(self):
+        return self._link
+
+    @link.setter
+    def link(self, value):
+        self._link = value
+
+    @property
+    def links(self):
+        return self._links
+
+    @links.setter
+    def links(self, value):
+        self._links = value
+
+
+class AluraLogin(AluraCrawler):
+    def __init__(self, user, password):
+        cj = CookieJar()
+        self._session = mechanize.Browser()
+        self._session.set_handle_robots(False)
+        self._session.set_cookiejar(cj)
+        self._session.open("https://cursos.alura.com.br/loginForm")
+        self._session.select_form(nr=1)
+        self._session.form['username'] = user
+        self._session.form['password'] = password
+        self._session.submit()
+        super().__init__(self._session)

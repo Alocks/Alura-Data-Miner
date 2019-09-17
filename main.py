@@ -1,6 +1,5 @@
-from alurascraper import AluraScraper, AluraLogin, AluraCrawler
-import parser
-
+from alurascraper import AluraLogin
+from fileparser import json_decoder, get_files
 
 #############Login#############
 print('Username:')
@@ -9,22 +8,19 @@ print('Password:')
 password = input()
 ###############################
 
-#######Creating Objects########
-l = AluraLogin(user, password)
-c = AluraCrawler(l._session)
-s = AluraScraper(l._session)
+#######Creating Object########
+a = AluraLogin(user, password)
 ###############################
 
-####################Crawler######################
-formacao = c.choose_formation()#Choose formation
-links = c.formation_crawler(formacao)#collect links
-#################################################
+a.formation_categories()#Scrap and select formation categories
 
-################Scraper################
-s.scraper(links) #Scrap all json chunks
-#######################################
+a.choose_formation(a.formations)#Scrap and select a formation
+
+links = a.formation_crawler(a.link)#Crawls all links which has a video
+
+a.formation_scraper(a.links)#Scrap all video links requests(json) and save to data.txt
 
 ###########################Parser###########################
-parser.decode_json('data.txt') #Parse json chunks to links
-parser.get('output.txt') #Download all links from a tet file
+json_decoder('data.txt') #Parse json chunks to links
+get_files('output.txt') #Download all links from a tet file
 ############################################################
