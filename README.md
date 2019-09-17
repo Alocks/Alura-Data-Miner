@@ -5,9 +5,9 @@ Attention, you need to be a paid member to work. And nope, I didn't code anythin
 By the way, the links for the video resets daily. Pay attention when downloading.
 
 # Documentation
-AluraLogin class:
+AluraLogin class:  
 -Login in the site. Only needed to crawl and scrap a formation.
   
-AluraScraper class:
--scraps categoriesformations from formation page
+AluraScraper class:  
+-scraps categoriesformations from formation page  
 -scraps json requests from video links
