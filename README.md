@@ -4,7 +4,7 @@ Attention, you need to be a paid member to work. And nope, I didn't code anythin
 
 By the way, the links for the video resets daily. Pay attention when downloading.
 
-# Documentation
+# Alura Scraper Documentation
 AluraLogin:  
 -Login in the site. Only needed to crawl and scrap a formation.  
 -Uses AluraScraper and AluraScraper as subclasses, so you only need to create one object.
@@ -20,3 +20,11 @@ AluraCrawler:
 -crawls formation links with video
 -Saves link formation and links with video from a formation into properties.
 usage: AluraCrawler.link, AulraCrawler.links
+
+
+# File Parser Documentation
+json_decoder():
+  decodes json chunks from a text file
+ 
+get_files():
+  download batch of links from a text file
