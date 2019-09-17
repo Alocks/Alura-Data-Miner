@@ -23,8 +23,8 @@ usage: AluraCrawler.link, AulraCrawler.links
 
 
 # File Parser Documentation
-json_decoder():
+json_decoder():  
   decodes json chunks from a text file
  
-get_files():
+get_files():  
   download batch of links from a text file
