@@ -2,7 +2,8 @@ import codecs
 import os
 import requests
 
-#decode json chunks from a text file
+
+# decode json chunks from a text file
 def json_decoder(file):
     file = open(file, 'r')
     file = file.read().replace(chr(92) * 2, chr(92))
@@ -24,7 +25,8 @@ def json_decoder(file):
             print(item)
             f.write(f'{item}\n')
 
-#Download batch of links from a .txt file
+
+# Download batch of links from a .txt file
 def get_files(data):
     file = open(data, 'r')
     lst = file.read().split('\n')
