@@ -1,10 +1,10 @@
-# Alura-Scraper
-Scrap all videos from a course you want and you can download'em automatically(downloading is optional).
+# Alura Data miner
+Crawls and Scrap all videos from a fomation you want and download in batch(downloading is optional).  
 Attention, you need to be a paid member to work. And nope, I didn't code anything to treat errors like wrong username/password or link yet.
 
 By the way, the links for the video resets daily. Pay attention when downloading.
 
-# Alura Scraper Documentation
+# # Alura Data miner Documentation
 AluraLogin:  
 -Login on the site. Only needed to crawl and scrap a formation.  
 -Uses AluraScraper and AluraCrawler as subclasses, so you only need to create one object.
