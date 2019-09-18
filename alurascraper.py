@@ -8,6 +8,11 @@ liga = 'https://cursos.alura.com.br'
 
 # lists properties
 def _listing(opcoes):
+    '''
+    Select an option from list
+    :param opcoes: List of options
+    :return: returns option chosen
+    '''
     while True:
         escolha = ''
         os.system('cls')
@@ -25,6 +30,7 @@ def _listing(opcoes):
 
 # Scraps Alura Formations!
 class AluraScraper:
+    test = '0'
     def __init__(self, session=None):
         # If called by AluraLogin, uses session from AluraLogin
         if session:
@@ -103,6 +109,7 @@ class AluraScraper:
         self._formations = value
 
 
+#Crawls all video links from a formation
 class AluraCrawler(AluraScraper):
     def __init__(self, session=None):
         self._session = session
@@ -110,12 +117,16 @@ class AluraCrawler(AluraScraper):
         self._link = None
         self._links = None
 
+    #Choose formation using href tag list from alura page
     def choose_formation(self, formacoes):
         formacao = _listing(formacoes)
         print(formacao + '  escolhida...')
         self.link = ['https://cursos.alura.com.br' + formacao]
 
-    def formation_crawler(self, lst, aux=0):
+    #Crawls every link that has video from a formation
+    def formation_crawler(self, lst=None, aux=0):
+        if not lst:
+            lst = self.link
         classes = ['learning-content__link', 'courseSectionList-section', 'task-menu-nav-item-link-VIDEO']
         links = []
         for link in lst:
@@ -126,6 +137,7 @@ class AluraCrawler(AluraScraper):
             return self.formation_crawler(lst=links, aux=aux + 1)
         self.links = links
 
+    #submethod for formation_crawler
     def __link_crawler(self, classes, req, aux=0):
         links = []
         soup = BeautifulSoup(req, 'html.parser')
@@ -151,7 +163,7 @@ class AluraCrawler(AluraScraper):
     def links(self, value):
         self._links = value
 
-
+#Login to Alura
 class AluraLogin(AluraCrawler):
     def __init__(self, user, password):
         cj = CookieJar()
