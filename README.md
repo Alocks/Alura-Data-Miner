@@ -4,7 +4,7 @@ Attention, you need to be a paid member to work. And nope, I didn't code anythin
 
 By the way, the links for the video resets daily. Pay attention when downloading.
 
-# Alura Scraper Documentation
+# Documentation
 class AluraLogin:  
 -Login on the site. Only needed to crawl and scrap a formation.  
 -Uses AluraScraper and AluraCrawler as subclasses, so you only need to create one object.
